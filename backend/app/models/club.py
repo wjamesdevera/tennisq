@@ -2,11 +2,10 @@ from app.db.schema import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import String, Integer, DateTime, func, Table, Column, ForeignKey
 from datetime import datetime
-from pydantic import BaseModel
 from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.models.player import Player
+    from app.models.player import PlayerORM
 
 club_admin = Table(
     "club_admin",
@@ -37,24 +36,15 @@ class ClubORM(Base):
     )
 
     # Relationship
-    admins: Mapped[List["Player"]] = relationship(
+    admins: Mapped[List["PlayerORM"]] = relationship(
         secondary=club_admin,
-        back_populates="players"
+        back_populates="admin_clubs"
     )
 
-    players: Mapped[List["Player"]] = relationship(
-        secondary=club_admin,
-        back_populates="players"
+    players: Mapped[List["PlayerORM"]] = relationship(
+        secondary=club_player,
+        back_populates="clubs"
     )
 
     def __repr__(self):
         return f"<Club(id={self.id}, name={self.name})>"
-
-
-class Club(BaseModel):
-    id: int
-    name: str
-    admins: List["Player"] | None
-    players: List["Player"] | None
-    created_at: datetime | None
-    updated_at: datetime | None

@@ -2,14 +2,12 @@ from app.db.schema import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import Integer, DateTime, func, ForeignKey
 from datetime import datetime
-from pydantic import BaseModel
 from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.models.category import Category
-    from app.models.team import Team
-    from app.models.match import MatchLog
-    from app.models.event import Event
+    from app.models.team import TeamORM
+    from app.models.event import EventORM
+    from app.models.category import CategoryORM
 
 
 class MatchLogORM(Base):
@@ -38,39 +36,24 @@ class MatchLogORM(Base):
         "teams.id", ondelete="CASCADE"), nullable=False)
 
     # Relationship
-    sets: Mapped[List["Set"]] = relationship(
+    sets: Mapped[List["SetORM"]] = relationship(
         "SetORM", back_populates="match_log", cascade="all,delete-orphan"
     )
 
-    category: Mapped['MatchLog'] = relationship(
-        "CategoryORM", back_populates="categories")
+    category: Mapped['CategoryORM'] = relationship(
+        "CategoryORM", back_populates="match_logs")
 
-    event: Mapped['MatchLog'] = relationship(
-        "EventORM", back_populates="events")
+    event: Mapped['EventORM'] = relationship(
+        "EventORM", back_populates="match_logs")
 
-    team_a: Mapped['MatchLog'] = relationship(
-        "TeamORM", back_populates="teams")
+    team_a: Mapped['TeamORM'] = relationship(
+        "TeamORM", foreign_keys=[team_a_id], back_populates="matches_as_team_a")
 
-    team_b: Mapped['MatchLog'] = relationship(
-        "TeamORM", back_populates="teams")
+    team_b: Mapped['TeamORM'] = relationship(
+        "TeamORM", foreign_keys=[team_b_id], back_populates="matches_as_team_b")
 
     def __repr__(self):
         return f"<Match(id={self.id}>"
-
-
-class MatchLog(BaseModel):
-    id: int
-    category_id: int | None
-    event_id: int | None
-    team_a_id: int | None
-    team_b_id: int | None
-    team_a: Team | None
-    team_b: Team | None
-    event: Event | None
-    category: Category | None
-    sets: List["Set"]
-    created_at: datetime | None
-    updated_at: datetime | None
 
 
 class SetORM(Base):
@@ -94,19 +77,8 @@ class SetORM(Base):
         "match_logs.id", ondelete="CASCADE"), nullable=False)
 
     # Relationship
-    match_log: Mapped['MatchLog'] = relationship(
+    match_log: Mapped['MatchLogORM'] = relationship(
         "MatchLogORM", back_populates="sets")
 
     def __repr__(self):
         return f"<Set(id={self.id}, team_a={self.team_a_score}, team_b={self.team_b_score}>"
-
-
-class Set(BaseModel):
-    id: int
-    set_number: int
-    team_a_score: int
-    team_b_score: int
-    created_at: datetime | None
-    updated_at: datetime | None
-    match_id: int | None
-    match_log: MatchLog | None
