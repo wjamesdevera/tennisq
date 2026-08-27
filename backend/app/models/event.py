@@ -38,5 +38,6 @@ class Event(BaseModel):
     name: str
     type: str
     date: datetime | None
+    match_logs: List["MatchLog"] | None
     created_at: datetime | None
     updated_at: datetime | None

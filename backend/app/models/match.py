@@ -3,8 +3,13 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import Integer, DateTime, func, ForeignKey
 from datetime import datetime
 from pydantic import BaseModel
-from typing import List
-from app.models.category import CategoryORM
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.category import Category
+    from app.models.team import Team
+    from app.models.match import MatchLog
+    from app.models.event import Event
 
 
 class MatchLogORM(Base):
@@ -55,6 +60,15 @@ class MatchLogORM(Base):
 
 class MatchLog(BaseModel):
     id: int
+    category_id: int | None
+    event_id: int | None
+    team_a_id: int | None
+    team_b_id: int | None
+    team_a: Team | None
+    team_b: Team | None
+    event: Event | None
+    category: Category | None
+    sets: List["Set"]
     created_at: datetime | None
     updated_at: datetime | None
 
@@ -94,3 +108,5 @@ class Set(BaseModel):
     team_b_score: int
     created_at: datetime | None
     updated_at: datetime | None
+    match_id: int | None
+    match_log: MatchLog | None

@@ -54,5 +54,7 @@ class ClubORM(Base):
 class Club(BaseModel):
     id: int
     name: str
+    admins: List["Player"] | None
+    players: List["Player"] | None
     created_at: datetime | None
     updated_at: datetime | None

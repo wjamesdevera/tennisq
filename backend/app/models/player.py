@@ -52,5 +52,7 @@ class Player(BaseModel):
     sets_lost: int = 0
     matches_played: int = 0
 
+    clubs: List["Club"]
+
     created_at: datetime | None
     updated_at: datetime | None

@@ -38,5 +38,6 @@ class TeamORM(Base):
 class Team(BaseModel):
     id: int
     name: str
+    players: List["Player"]
     created_at: datetime | None
     updated_at: datetime | None
