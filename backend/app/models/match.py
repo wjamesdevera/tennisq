@@ -26,6 +26,12 @@ class MatchLogORM(Base):
     event_id: Mapped[int] = mapped_column(Integer, ForeignKey(
         "events.id", ondelete="CASCADE"), nullable=False)
 
+    team_a_id: Mapped[int] = mapped_column(Integer, ForeignKey(
+        "teams.id", ondelete="CASCADE"), nullable=False)
+
+    team_b_id: Mapped[int] = mapped_column(Integer, ForeignKey(
+        "teams.id", ondelete="CASCADE"), nullable=False)
+
     # Relationship
     sets: Mapped[List["Set"]] = relationship(
         "SetORM", back_populates="match_log", cascade="all,delete-orphan"
@@ -36,6 +42,12 @@ class MatchLogORM(Base):
 
     event: Mapped['MatchLog'] = relationship(
         "EventORM", back_populates="events")
+
+    team_a: Mapped['MatchLog'] = relationship(
+        "TeamORM", back_populates="teams")
+
+    team_b: Mapped['MatchLog'] = relationship(
+        "TeamORM", back_populates="teams")
 
     def __repr__(self):
         return f"<Match(id={self.id}>"
