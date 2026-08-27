@@ -7,8 +7,12 @@ from alembic import context
 
 
 from app.db.schema import Base
-from app.models.player import *
-from app.models.club import *
+
+# Insert Models Here
+from app.models.team import TeamORM
+from app.models.player import PlayerORM
+from app.models.club import ClubORM
+
 from app.core.config import config as app_config
 
 # this is the Alembic Config object, which provides
