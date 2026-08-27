@@ -1,22 +1,23 @@
 from sqlalchemy.orm import mapped_column, Mapped
 from app.db.schema import Base
-from sqlalchemy import String, Integer, DateTime, func, UUID
+from sqlalchemy import String, Integer, DateTime, func, Uuid
 from datetime import datetime
+from pydantic import BaseModel
 import uuid
 
 
-class PlayerModel(Base):
+class PlayerORM(Base):
     __tablename__ = "players"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=func.uuid_generate_v4())
+        Uuid, primary_key=True, default=func.uuid_generate_v4())
     name: Mapped[str] = mapped_column(String(200))
-    rank: Mapped[int] = mapped_column(Integer())
-    games_won: Mapped[int] = mapped_column(Integer())
-    games_lost: Mapped[int] = mapped_column(Integer())
-    sets_won: Mapped[int] = mapped_column(Integer())
-    sets_lost: Mapped[int] = mapped_column(Integer())
-    matches_played: Mapped[int] = mapped_column(Integer())
+    rank: Mapped[int] = mapped_column(Integer(), default=0)
+    games_won: Mapped[int] = mapped_column(Integer(), default=0)
+    games_lost: Mapped[int] = mapped_column(Integer(), default=0)
+    sets_won: Mapped[int] = mapped_column(Integer(), default=0)
+    sets_lost: Mapped[int] = mapped_column(Integer(), default=0)
+    matches_played: Mapped[int] = mapped_column(Integer(), default=0)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
@@ -27,3 +28,17 @@ class PlayerModel(Base):
 
     def __repr__(self):
         return f"<Player(id={self.id}, name={self.name})>"
+
+
+class Player(BaseModel):
+    id: uuid.UUID
+    name: str
+    rank: int = 0
+    games_won: int = 0
+    games_lost: int = 0
+    sets_won: int = 0
+    sets_lost: int = 0
+    matches_played: int = 0
+
+    created_at: datetime
+    updated_at: datetime
