@@ -4,6 +4,7 @@ from sqlalchemy import Integer, DateTime, func, ForeignKey
 from datetime import datetime
 from pydantic import BaseModel
 from typing import List
+from app.models.category import CategoryORM
 
 
 class MatchLogORM(Base):
@@ -18,10 +19,17 @@ class MatchLogORM(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
+    # Foreign Key
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey(
+        "categories.id", ondelete="CASCADE"), nullable=False)
+
     # Relationship
     sets: Mapped[List["Set"]] = relationship(
         "SetORM", back_populates="match_log", cascade="all,delete-orphan"
     )
+
+    category: Mapped['MatchLog'] = relationship(
+        "CategoryORM", back_populates="categories")
 
     def __repr__(self):
         return f"<Match(id={self.id}>"
