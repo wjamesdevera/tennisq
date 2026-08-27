@@ -23,6 +23,9 @@ class MatchLogORM(Base):
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey(
         "categories.id", ondelete="CASCADE"), nullable=False)
 
+    event_id: Mapped[int] = mapped_column(Integer, ForeignKey(
+        "events.id", ondelete="CASCADE"), nullable=False)
+
     # Relationship
     sets: Mapped[List["Set"]] = relationship(
         "SetORM", back_populates="match_log", cascade="all,delete-orphan"
@@ -30,6 +33,9 @@ class MatchLogORM(Base):
 
     category: Mapped['MatchLog'] = relationship(
         "CategoryORM", back_populates="categories")
+
+    event: Mapped['MatchLog'] = relationship(
+        "EventORM", back_populates="events")
 
     def __repr__(self):
         return f"<Match(id={self.id}>"

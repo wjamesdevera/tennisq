@@ -1,8 +1,12 @@
+from typing import List
+
 from app.db.schema import Base
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import String, Integer, DateTime, Date, func
 from datetime import datetime
 from pydantic import BaseModel
+
+from app.models.match import MatchLog
 
 
 class EventORM(Base):
@@ -18,6 +22,11 @@ class EventORM(Base):
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    # Relationship
+    match_logs: Mapped[List["MatchLog"]] = relationship(
+        "MatchLogORM", back_populates="match_logs",
     )
 
     def __repr__(self):
