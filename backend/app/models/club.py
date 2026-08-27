@@ -3,11 +3,20 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import String, Integer, DateTime, func, Table, Column, ForeignKey
 from datetime import datetime
 from pydantic import BaseModel
-from typing import List
-from app.models.player import Player
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.models.player import Player
 
 club_admin = Table(
     "club_admin",
+    Base.metadata,
+    Column("club_id", ForeignKey("clubs.id"), primary_key=True),
+    Column("player_id", ForeignKey("players.id"), primary_key=True),
+)
+
+club_player = Table(
+    "club_player",
     Base.metadata,
     Column("club_id", ForeignKey("clubs.id"), primary_key=True),
     Column("player_id", ForeignKey("players.id"), primary_key=True),
@@ -29,6 +38,11 @@ class ClubORM(Base):
 
     # Relationship
     admins: Mapped[List["Player"]] = relationship(
+        secondary=club_admin,
+        back_populates="players"
+    )
+
+    players: Mapped[List["Player"]] = relationship(
         secondary=club_admin,
         back_populates="players"
     )

@@ -1,9 +1,15 @@
-from sqlalchemy.orm import mapped_column, Mapped
+from typing import List, TYPE_CHECKING
+
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from app.db.schema import Base
 from sqlalchemy import String, Integer, DateTime, func, Uuid
 from datetime import datetime
 from pydantic import BaseModel
+from app.models.club import club_player
 import uuid
+
+if TYPE_CHECKING:
+    from app.models.club import Club
 
 
 class PlayerORM(Base):
@@ -24,6 +30,12 @@ class PlayerORM(Base):
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    # Relationship
+    clubs: Mapped[List["Club"]] = relationship(
+        secondary=club_player,
+        back_populates="clubs"
     )
 
     def __repr__(self):
