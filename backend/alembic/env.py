@@ -12,6 +12,7 @@ from app.db.schema import Base
 from app.models.team import TeamORM
 from app.models.player import PlayerORM
 from app.models.club import ClubORM
+from app.models.category import CategoryORM
 
 from app.core.config import config as app_config
 
