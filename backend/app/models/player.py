@@ -40,5 +40,5 @@ class Player(BaseModel):
     sets_lost: int = 0
     matches_played: int = 0
 
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime | None
+    updated_at: datetime | None
