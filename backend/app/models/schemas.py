@@ -18,7 +18,7 @@ class Category(BaseModel):
 class Player(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID
+    id: uuid.UUID | None
     name: str
     rank: int = 0
     games_won: int = 0
