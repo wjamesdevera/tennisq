@@ -20,15 +20,12 @@ CATEGORIES = [
 ]
 
 
-async def seed_categories(session: AsyncSession):
-    print("Seeding Categories...")
-    for category in CATEGORIES:
-        print(f"Adding: {category}")
-        category_obj = CategoryORM(name=category)
-        session.add(category_obj)
-        await session.flush()
-        await session.refresh(category_obj)
-    print(f'Successfully added {len(CATEGORIES)} categories.')
+async def _create_category(session: AsyncSession, name: str):
+    category_obj = CategoryORM(name=name)
+    print(f"Creating: {name}")
+    session.add(category_obj)
+    await session.flush()
+    await session.refresh(category_obj)
 
 
 def _generate_player() -> Player:
@@ -52,7 +49,7 @@ def _generate_player() -> Player:
     )
 
 
-async def seed_players(session: AsyncSession):
+async def _seed_players(session: AsyncSession):
     print("Seeding Players...")
 
     for i in range(1000):
@@ -66,14 +63,21 @@ async def seed_players(session: AsyncSession):
     print(f'Successfully added {1000} players.')
 
 
+async def _seed_categories(session: AsyncSession):
+    print("Seeding Categories...")
+    for category in CATEGORIES:
+        _create_category(session=session, name=category)
+    print(f'Successfully added {len(CATEGORIES)} categories.')
+
+
 async def _run_seed():
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
 
     async with async_session_maker() as session:
-        await seed_players(session)
-        await seed_categories(session)
+        await _seed_players(session)
+        await _seed_categories(session)
         await session.commit()
 
 
