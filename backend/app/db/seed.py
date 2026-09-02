@@ -66,7 +66,7 @@ async def _seed_players(session: AsyncSession):
 async def _seed_categories(session: AsyncSession):
     print("Seeding Categories...")
     for category in CATEGORIES:
-        _create_category(session=session, name=category)
+        await _create_category(session=session, name=category)
     print(f'Successfully added {len(CATEGORIES)} categories.')
 
 
