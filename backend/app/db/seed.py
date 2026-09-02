@@ -7,6 +7,7 @@ from app.db.schema import Base
 from app.models.category import CategoryORM
 from app.models.player import PlayerORM
 from app.models.schemas import Player
+from app.models.club import ClubORM
 from faker import Faker
 
 fake = Faker()
@@ -19,6 +20,19 @@ CATEGORIES = [
     "mixed_doubles",
 ]
 
+fake_tennis_clubs = [
+    "The Rochambeau Club",
+    "Bushwood Country Club",
+    "The Royal Tenenbaum Tennis Center",
+    "High Ridge Country Club",
+    "Encino Country Club",
+    "The Atlanta Tennis Club",
+    "Greenbriar Racquet & Country Club",
+    "Sunset Ridge Lawn Tennis Club",
+    "Pinewood Valley Racquet Club",
+    "The Rolling Hills Lawn & Tennis Association",
+]
+
 
 async def _create_category(session: AsyncSession, name: str):
     category_obj = CategoryORM(name=name)
@@ -26,6 +40,14 @@ async def _create_category(session: AsyncSession, name: str):
     session.add(category_obj)
     await session.flush()
     await session.refresh(category_obj)
+
+
+async def _create_club(session: AsyncSession, name: str):
+    club_obj = ClubORM(name=name)
+    print(f"Creating: {name}")
+    session.add(club_obj)
+    await session.flush()
+    await session.refresh(club_obj)
 
 
 def _generate_player() -> Player:
@@ -70,6 +92,13 @@ async def _seed_categories(session: AsyncSession):
     print(f'Successfully added {len(CATEGORIES)} categories.')
 
 
+async def _seed_clubs(session: AsyncSession):
+    print("Seeding Clubs...")
+    for club in fake_tennis_clubs:
+        await _create_club(session=session, name=club)
+    print(f'Successfully added {len(fake_tennis_clubs)} clubs.')
+
+
 async def _run_seed():
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
@@ -77,6 +106,7 @@ async def _run_seed():
 
     async with async_session_maker() as session:
         await _seed_players(session)
+        await _seed_clubs(session)
         await _seed_categories(session)
         await session.commit()
 
