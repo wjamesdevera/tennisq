@@ -7,8 +7,10 @@ from app.db.schema import Base
 from app.models.category import CategoryORM
 from app.models.player import PlayerORM
 from app.models.schemas import Player
-from app.models.club import ClubORM
+from app.models.club import ClubORM, club_player
 from faker import Faker
+
+from sqlalchemy import insert, select
 
 fake = Faker()
 
@@ -99,6 +101,19 @@ async def _seed_clubs(session: AsyncSession):
     print(f'Successfully added {len(fake_tennis_clubs)} clubs.')
 
 
+async def _fill_clubs(session: AsyncSession):
+    clubs = list((await session.scalars(select(ClubORM))).all())
+    players = list((await session.scalars(select(PlayerORM))).all())
+    club_memberships = [
+        {
+            "club_id": fake.random_element(clubs).id,
+            "player_id": player.id,
+        }
+        for player in players
+    ]
+    await session.execute(insert(club_player), club_memberships)
+
+
 async def _run_seed():
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
@@ -108,6 +123,7 @@ async def _run_seed():
         await _seed_players(session)
         await _seed_clubs(session)
         await _seed_categories(session)
+        await _fill_clubs(session)
         await session.commit()
 
 
