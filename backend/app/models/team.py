@@ -2,9 +2,12 @@ from app.db.schema import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import String, Integer, DateTime, func, Table, Column, ForeignKey
 from datetime import datetime
-from pydantic import BaseModel
-from typing import List
-from app.models.player import Player
+from typing import List, TYPE_CHECKING
+from app.models.player import PlayerORM
+from app.models.schemas import Team
+
+if TYPE_CHECKING:
+    from app.models.match import MatchLogORM
 
 team_player_table = Table(
     "team_player",
@@ -28,16 +31,18 @@ class TeamORM(Base):
     )
 
     # Relationship
-    players: Mapped[List["Player"]] = relationship(
-        secondary=team_player_table, back_populates="players")
+    players: Mapped[List["PlayerORM"]] = relationship(
+        secondary=team_player_table, back_populates="teams")
+
+    matches_as_team_a: Mapped[List["MatchLogORM"]] = relationship(
+        "MatchLogORM", foreign_keys="MatchLogORM.team_a_id",
+        back_populates="team_a"
+    )
+
+    matches_as_team_b: Mapped[List["MatchLogORM"]] = relationship(
+        "MatchLogORM", foreign_keys="MatchLogORM.team_b_id",
+        back_populates="team_b"
+    )
 
     def __repr__(self):
         return f"<Team(id={self.id}, name={self.name})>"
-
-
-class Team(BaseModel):
-    id: int
-    name: str
-    players: List["Player"]
-    created_at: datetime | None
-    updated_at: datetime | None
