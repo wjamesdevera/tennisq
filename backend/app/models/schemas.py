@@ -34,7 +34,7 @@ class Player(BaseModel):
 class Club(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: int | None
     name: str
     admins: list[Player] = Field(default_factory=list)
     players: list[Player] = Field(default_factory=list)
