@@ -6,6 +6,7 @@ from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.models.player import PlayerORM
+    from app.models.event import EventORM
 
 club_admin = Table(
     "club_admin",
@@ -44,6 +45,11 @@ class ClubORM(Base):
     players: Mapped[List["PlayerORM"]] = relationship(
         secondary=club_player,
         back_populates="clubs"
+    )
+
+    events: Mapped[List["EventORM"]] = relationship(
+        "EventORM",
+        back_populates="club"
     )
 
     def __repr__(self):

@@ -85,7 +85,7 @@ class MatchLog(BaseModel):
 class Event(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: str | None = None
     name: str
     type: str
     date: date_type | None = None

@@ -3,10 +3,11 @@ import uuid
 
 from app.db.schema import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import String, Integer, DateTime, Date, Uuid, func
+from sqlalchemy import String, Integer, DateTime, Date, Uuid, func, ForeignKey
 from datetime import datetime
 
 from app.models.match import MatchLogORM
+from app.models.club import ClubORM
 
 
 class EventORM(Base):
@@ -24,6 +25,14 @@ class EventORM(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+    # Foreign Key
+    club_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("clubs.id", ondelete="CASCADE"),
+        nullable=False
+    )
+    club: Mapped['ClubORM'] = relationship("ClubORM", back_populates="events")
 
     # Relationship
     match_logs: Mapped[List["MatchLogORM"]] = relationship(
