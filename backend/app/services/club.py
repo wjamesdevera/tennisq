@@ -1,6 +1,7 @@
 from app.models.club import ClubORM
+from app.models.event import EventORM
 from app.models.player import Player, PlayerORM
-from app.models.schemas import Club
+from app.models.schemas import Club, Event
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -35,3 +36,13 @@ async def add_player(session: AsyncSession, club_id: int, player: Player):
 
     club_obj.players.append(player_obj)
     return player_obj
+
+
+async def add_event(session: AsyncSession, event: Event):
+    event_obj = EventORM(name=event.name, type=event.type,
+                         date=event.date, club_id=event.club_id)
+    session.add(event_obj)
+    await session.flush()
+    await session.refresh(event_obj)
+
+    return event_obj

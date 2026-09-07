@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from app.core.dependencies import AsyncSessionDep
-from app.models.schemas import Club, Player
-from app.services.club import add_player, create_club, get_players
+from app.models.schemas import Club, Event, Player
+from app.services.club import add_event, add_player, create_club, get_players
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -28,6 +28,14 @@ async def get_club_players(session: AsyncSessionDep, club_id: int):
 async def create_club_player(player: Player, club_id: int, session: AsyncSessionDep):
     created_player = await add_player(session=session, player=player, club_id=club_id)
     return {"success": "ok", "result": created_player}
+
+
+# POST /v1/api/clubs/:club_id/events
+@router.post('/{club_id}/events', status_code=status.HTTP_201_CREATED)
+async def created_event(event: Event, club_id: int, session: AsyncSessionDep):
+    event.club_id = club_id
+    created_event = await add_event(session=session, event=event)
+    return {"success": "ok", "result": created_event}
 
 
 # POST /v1/api/clubs/
