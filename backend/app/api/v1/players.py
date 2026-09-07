@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from app.core.dependencies import AsyncSessionDep
-from app.services.players import get_players
+from app.services.players import get_players, get_players_from_club
 
 router = APIRouter()
 
