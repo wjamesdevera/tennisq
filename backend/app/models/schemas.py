@@ -88,7 +88,9 @@ class Event(BaseModel):
     id: str | None = None
     name: str
     type: str
-    date: date_type | None = None
+    date: date_type | None = datetime.now()
+    club_id: int | None = None
+    club: Club | None = None
     match_logs: list[MatchLog] = Field(default_factory=list)
     created_at: datetime | None = None
     updated_at: datetime | None = None
