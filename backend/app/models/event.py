@@ -1,8 +1,9 @@
 from typing import List
+import uuid
 
 from app.db.schema import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import String, Integer, DateTime, Date, func
+from sqlalchemy import String, Integer, DateTime, Date, Uuid, func
 from datetime import datetime
 
 from app.models.match import MatchLogORM
@@ -11,7 +12,8 @@ from app.models.match import MatchLogORM
 class EventORM(Base):
     __tablename__ = "events"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(200))
     type: Mapped[str] = mapped_column(String(200))
     date: Mapped[datetime] = mapped_column(Date, server_default=func.now())
