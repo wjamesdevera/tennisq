@@ -1,5 +1,5 @@
-
 from app.models.club import ClubORM
+from app.models.player import Player, PlayerORM
 from app.models.schemas import Club
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -20,3 +20,18 @@ async def get_players(session: AsyncSession, club_id: int):
     result = await session.execute(stmt)
     club_obj = result.scalar_one_or_none()
     return club_obj.players
+
+
+async def add_player(session: AsyncSession, club_id: int, player: Player):
+    stmt = select(ClubORM).where(ClubORM.id == club_id).options(
+        selectinload(ClubORM.players))
+    result = await session.execute(stmt)
+    club_obj = result.scalar_one_or_none()
+
+    player_obj = PlayerORM(**player.model_dump())
+    session.add(player_obj)
+    await session.flush()
+    await session.refresh(player_obj)
+
+    club_obj.players.append(player_obj)
+    return player_obj
