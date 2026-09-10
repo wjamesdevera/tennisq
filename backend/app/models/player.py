@@ -10,6 +10,7 @@ import uuid
 
 if TYPE_CHECKING:
     from app.models.club import ClubORM
+    from app.models.event import EventORM
     from app.models.team import TeamORM
 
 
@@ -45,7 +46,7 @@ class PlayerORM(Base):
         secondary="team_player",
         back_populates="players"
     )
-    events: Mapped[List["TeamORM"]] = relationship(
+    events: Mapped[List["EventORM"]] = relationship(
         secondary="event_player",
         back_populates="players"
     )
