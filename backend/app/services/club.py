@@ -1,7 +1,7 @@
 from app.models.club import ClubORM
 from app.models.event import EventORM
-from app.models.player import Player, PlayerORM
-from app.models.schemas import Club, Event
+from app.models.player import PlayerORM
+from app.models.schemas import Club, Event, Player
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
