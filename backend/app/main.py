@@ -6,5 +6,4 @@ app = FastAPI(title=config.app_name)
 
 app.include_router(router=health.router, prefix="/v1")
 app.include_router(router=club.router, prefix="/v1/clubs")
-app.include_router(router=players.router, prefix="/v1/players")
 app.include_router(router=event.router, prefix="/v1/events")
