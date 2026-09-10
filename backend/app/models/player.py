@@ -5,7 +5,7 @@ from app.db.schema import Base
 from sqlalchemy import String, Integer, DateTime, func, Uuid
 from datetime import datetime
 from app.models.club import club_admin, club_player
-from app.models.schemas import Player
+from app.models.event import event_player
 import uuid
 
 if TYPE_CHECKING:
@@ -43,6 +43,10 @@ class PlayerORM(Base):
     )
     teams: Mapped[List["TeamORM"]] = relationship(
         secondary="team_player",
+        back_populates="players"
+    )
+    events: Mapped[List["TeamORM"]] = relationship(
+        secondary="event_player",
         back_populates="players"
     )
 

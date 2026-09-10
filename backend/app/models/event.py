@@ -1,13 +1,23 @@
-from typing import List
+from typing import TYPE_CHECKING, List
 import uuid
 
 from app.db.schema import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import String, Integer, DateTime, Date, Uuid, func, ForeignKey
+from sqlalchemy import String, Integer, DateTime, Date, Uuid, func, ForeignKey, Table, Column
 from datetime import datetime
 
 from app.models.match import MatchLogORM
 from app.models.club import ClubORM
+
+if TYPE_CHECKING:
+    from app.models.player import PlayerORM
+
+event_player = Table(
+    "event_player",
+    Base.metadata,
+    Column("event_id", ForeignKey("events.id"), primary_key=True),
+    Column("player_id", ForeignKey("players.id"), primary_key=True),
+)
 
 
 class EventORM(Base):
@@ -37,6 +47,11 @@ class EventORM(Base):
     # Relationship
     match_logs: Mapped[List["MatchLogORM"]] = relationship(
         "MatchLogORM", back_populates="event",
+    )
+
+    players: Mapped[List["PlayerORM"]] = relationship(
+        secondary=event_player,
+        back_populates="events"
     )
 
     def __repr__(self):
