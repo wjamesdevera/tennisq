@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from app.core.dependencies import AsyncSessionDep
 from app.models.schemas import Club, Event, Player
-from app.services.club import ClubService
+from app.services.club_service import ClubService
 from pydantic import BaseModel
 
 router = APIRouter()

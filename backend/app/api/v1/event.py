@@ -1,9 +1,9 @@
 import uuid
 
-from app.services.players import PlayerService
+from app.services.player_service import PlayerService
 from fastapi import APIRouter, status, HTTPException
 from app.core.dependencies import AsyncSessionDep
-from app.services.event import EventService
+from app.services.event_service import EventService
 from pydantic import BaseModel
 
 router = APIRouter()
