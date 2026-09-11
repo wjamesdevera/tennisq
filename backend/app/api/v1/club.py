@@ -1,7 +1,8 @@
 from app.schemas.club import CreateClub
+from app.schemas.event import CreateEvent
 from fastapi import APIRouter, HTTPException, status
 from app.core.dependencies import AsyncSessionDep
-from app.models.schemas import Club, Event, Player
+from app.models.schemas import Club, Player
 from app.services.club_service import ClubService
 
 router = APIRouter()
@@ -30,7 +31,7 @@ async def create_club_player(player: Player, club_id: int, session: AsyncSession
 
 # POST /v1/api/clubs/:club_id/events
 @router.post('/{club_id}/events', status_code=status.HTTP_201_CREATED)
-async def created_event(event: Event, club_id: int, session: AsyncSessionDep):
+async def created_event(event: CreateEvent, club_id: int, session: AsyncSessionDep):
     club_service = ClubService(session)
     event.club_id = club_id
     created_event = await club_service.add_event(event=event)
