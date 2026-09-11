@@ -1,6 +1,6 @@
 import uuid
 
-from app.services.players import find_player
+from app.services.players import PlayerService
 from fastapi import APIRouter, status, HTTPException
 from app.core.dependencies import AsyncSessionDep
 from app.services.event import EventService
@@ -17,6 +17,8 @@ class PlayerIdModel(BaseModel):
 @router.patch('/{event_id}/players', status_code=status.HTTP_200_OK)
 async def add_player(event_id: uuid.UUID, player: PlayerIdModel, session: AsyncSessionDep):
     event_service = EventService(session)
+    player_service = PlayerService(session)
+
     event_obj = await event_service.find_event(event_id)
     if not event_obj:
         raise HTTPException(
@@ -27,7 +29,7 @@ async def add_player(event_id: uuid.UUID, player: PlayerIdModel, session: AsyncS
                 "code": 404,
             }
         )
-    player_obj = await find_player(player.id, session, with_club=True)
+    player_obj = await player_service.find_player(player.id, with_club=True)
     if not player_obj:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
