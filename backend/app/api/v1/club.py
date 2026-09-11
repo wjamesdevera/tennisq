@@ -1,8 +1,8 @@
 from app.schemas.club import CreateClub
 from app.schemas.event import CreateEvent
+from app.schemas.player import Player
 from fastapi import APIRouter, HTTPException, status
 from app.core.dependencies import AsyncSessionDep
-from app.models.schemas import Club, Player
 from app.services.club_service import ClubService
 
 router = APIRouter()
@@ -42,7 +42,7 @@ async def created_event(event: CreateEvent, club_id: int, session: AsyncSessionD
 @router.post('', status_code=status.HTTP_201_CREATED)
 async def create(club: CreateClub, session: AsyncSessionDep):
     club_service = ClubService(session)
-    new_club: Club | None = await club_service.create_club(name=club.name)
+    new_club = await club_service.create_club(name=club.name)
     if not new_club:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

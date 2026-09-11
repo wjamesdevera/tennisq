@@ -1,21 +1,17 @@
 import uuid
 
 from app.services.player_service import PlayerService
+from app.schemas.player import AddPlayer
 from fastapi import APIRouter, status, HTTPException
 from app.core.dependencies import AsyncSessionDep
 from app.services.event_service import EventService
-from pydantic import BaseModel
 
 router = APIRouter()
 
 
-class PlayerIdModel(BaseModel):
-    id: uuid.UUID
-
-
 # PATCH /events/:event_id/players
 @router.patch('/{event_id}/players', status_code=status.HTTP_200_OK)
-async def add_player(event_id: uuid.UUID, player: PlayerIdModel, session: AsyncSessionDep):
+async def add_player(event_id: uuid.UUID, player: AddPlayer, session: AsyncSessionDep):
     event_service = EventService(session)
     player_service = PlayerService(session)
 

@@ -4,7 +4,6 @@ from sqlalchemy import String, Integer, DateTime, func, Table, Column, ForeignKe
 from datetime import datetime
 from typing import List, TYPE_CHECKING
 from app.models.player import PlayerORM
-from app.models.schemas import Team
 
 if TYPE_CHECKING:
     from app.models.match import MatchLogORM

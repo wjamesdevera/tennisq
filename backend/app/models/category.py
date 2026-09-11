@@ -2,7 +2,6 @@ from app.db.schema import Base
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import String, Integer, DateTime, func
 from datetime import datetime
-from app.models.schemas import Category
 from typing import List
 
 from app.models.match import MatchLogORM
