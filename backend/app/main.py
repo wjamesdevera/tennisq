@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.core.config import config
-from app.api.v1 import health, club, players, event
+from app.api.v1 import health, club, event
 
 app = FastAPI(title=config.app_name)
 

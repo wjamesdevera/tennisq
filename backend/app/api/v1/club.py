@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from app.core.dependencies import AsyncSessionDep
 from app.models.schemas import Club, Event, Player
-from app.services.club import add_event, add_player, create_club, get_players
+from app.services.club import ClubService
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -19,31 +19,35 @@ async def get():
 # GET /v1/api/clubs/:club_id/players
 @router.get('/{club_id}/players', status_code=status.HTTP_200_OK)
 async def get_club_players(session: AsyncSessionDep, club_id: int):
-    players = await get_players(session=session, club_id=club_id)
-    return {"success": "ok", "result": players}
+    club_service = ClubService(session)
+    players = await club_service.get_players(club_id)
+    return {"status": "success", "result": players}
 
 
 # POST /v1/api/clubs/:club_id/players
 @router.post('/{club_id}/players', status_code=status.HTTP_201_CREATED)
 async def create_club_player(player: Player, club_id: int, session: AsyncSessionDep):
-    created_player = await add_player(session=session, player=player, club_id=club_id)
-    return {"success": "ok", "result": created_player}
+    club_service = ClubService(session)
+    created_player = await club_service.add_player(player=player, club_id=club_id)
+    return {"status": "success", "result": created_player}
 
 
 # POST /v1/api/clubs/:club_id/events
 @router.post('/{club_id}/events', status_code=status.HTTP_201_CREATED)
 async def created_event(event: Event, club_id: int, session: AsyncSessionDep):
+    club_service = ClubService(session)
     event.club_id = club_id
-    created_event = await add_event(session=session, event=event)
-    return {"success": "ok", "result": created_event}
+    created_event = await club_service.add_event(event=event)
+    return {"status": "success", "result": created_event}
 
 
 # POST /v1/api/clubs/
-@router.post('', response_model=Club, status_code=status.HTTP_201_CREATED)
+@router.post('', status_code=status.HTTP_201_CREATED)
 async def create(club: CreateClub, session: AsyncSessionDep):
-    new_club: Club | None = await create_club(name=club.name, session=session)
+    club_service = ClubService(session)
+    new_club: Club | None = await club_service.create_club(name=club.name)
     if not new_club:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    return new_club.model_dump(mode='json')
+    return {"status": "success", "result": new_club}
