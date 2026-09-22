@@ -12,6 +12,9 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 
+// TODO: Add a handler for empty rows to avoid layout jump when reaching the last page with empty rows.
+// TODO: Add a handler for when the table is empty to display a message like "No players found" or "No data available".
+
 const DEFAULT_TABLE_CONFIG = {
   order: "asc" as Order,
   orderBy: "rank" as keyof PlayerTableRow,
@@ -55,7 +58,7 @@ const headCells: readonly HeadCell[] = [
   {
     id: "name",
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: "Player Name",
   },
   {
@@ -234,12 +237,7 @@ export default function EventPlayerTable({ rows }: EventPlayerTableProps) {
                     selected={isItemSelected}
                     sx={{ cursor: "pointer" }}
                   >
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
+                    <TableCell component="th" id={labelId} scope="row">
                       {row.name}
                     </TableCell>
                     <TableCell align="right">{row.rank}</TableCell>
