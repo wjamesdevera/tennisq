@@ -133,9 +133,34 @@ export default async function EventPage({
   const { id } = await params;
   return (
     <>
-      <main>
-        <h2>Event: {id}</h2>
-        <EventPlayerTable rows={players} />
+      <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <div className="max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex">
+          <h2 className="font-bold text-xl">Event: {id}</h2>
+          <p>Event Date: {new Date().toLocaleDateString()}</p>
+        </div>
+        <div className="rounded-lg border border-gray-300 p-4 max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-2">
+          <h3 className="font-bold text-lg">Next Match Up</h3>
+          <div className="flex flex-row items-center justify-center gap-4 w-full">
+            <div className="rounded-lg border border-gray-300 p-4 max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-2">
+              <h4 className="font-bold text-lg">Team 1</h4>
+              <ul>
+                <li>Player Name</li>
+                <li>Player Name</li>
+              </ul>
+            </div>
+            <div className="font-bold text-lg">vs</div>
+            <div className="rounded-lg border border-gray-300 p-4 max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-2">
+              <h4 className="font-bold text-lg">Team 2</h4>
+              <ul>
+                <li>Player Name</li>
+                <li>Player Name</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <article className="max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex">
+          <EventPlayerTable rows={players} />
+        </article>
       </main>
     </>
   );
