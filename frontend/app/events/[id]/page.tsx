@@ -11,11 +11,11 @@ export default async function EventPage({
   return (
     <>
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <div className="max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex">
+        <div className="max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-2">
           <h2 className="font-bold text-xl">Event: {id}</h2>
           <p>Event Date: {new Date().toLocaleDateString()}</p>
         </div>
-        <div className="rounded-lg border border-gray-300 p-4 max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-2">
+        <div className="rounded-lg border border-gray-100 p-4 max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-4">
           <h3 className="font-bold text-lg">Next Match Up</h3>
           <div className="flex flex-row items-center justify-center gap-4 w-full">
             <div className="rounded-lg border border-gray-300 p-4 max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-2">
