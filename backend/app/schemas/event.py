@@ -6,6 +6,7 @@ from typing import List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .match_log import MatchLog
+    from .player import Player
 
 
 class CreateEvent(BaseModel):
@@ -22,5 +23,6 @@ class Event(BaseModel):
     max_players: int
     date: date_type | None = datetime.now()
     match_logs: List["MatchLog"] = Field(default_factory=list)
+    players: List["Player"] = Field(default_factory=list)
     created_at: datetime | None = None
     updated_at: datetime | None = None

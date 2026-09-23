@@ -1,5 +1,6 @@
 import asyncio
 
+from app.models.event import EventORM
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.engine import async_session_maker, engine
@@ -7,9 +8,9 @@ from app.db.schema import Base
 from app.models.category import CategoryORM
 from app.models.player import PlayerORM
 from app.schemas.player import Player
+from app.schemas.event import Event
+from datetime import date, datetime
 from faker import Faker
-
-from sqlalchemy import insert, select
 
 fake = Faker()
 
@@ -42,6 +43,7 @@ def _generate_player() -> Player:
 
     return Player(
         id=None,
+        rank=0,
         name=name,
         matches_played=matches_played,
         games_won=games_won,
@@ -51,18 +53,74 @@ def _generate_player() -> Player:
     )
 
 
+def get_random_past_date(years_back: int = 3) -> date:
+    return fake.date_between(start_date=f"-{years_back}y", end_date="today")
+
+
+def _generate_event() -> Event:
+    name: str = f'{fake.company()} {fake.catch_phrase()}'
+    description: str = f'{fake.text(150)}'
+    event_date: date = get_random_past_date()
+    return Event(
+        id=None,
+        name=name,
+        description=description,
+        max_players=50,
+        date=event_date,
+        match_logs=[]
+    )
+
+
+async def _seed_events(session: AsyncSession):
+    print("Seeding Events...")
+    total_players_created = 0
+
+    for event_index in range(50):
+        event: Event = _generate_event()
+        print(f"Adding: {event.name}")
+
+        event_data = event.model_dump(exclude={"players", "match_logs"})
+        event_obj = EventORM(**event_data)
+        session.add(event_obj)
+        await session.flush()
+        await session.refresh(event_obj, attribute_names=["players"])
+
+        number_of_players = fake.random_int(2, 50)
+        print(f"Adding {number_of_players} Players to {event_obj.name}...")
+
+        players_for_event: list[PlayerORM] = []
+        for _ in range(number_of_players):
+            player = _generate_player()
+            print(f"Adding: {player.name}")
+            player_obj = PlayerORM(
+                **player.model_dump(exclude={"id", "created_at", "updated_at"}))
+            session.add(player_obj)
+            await session.flush()
+            await session.refresh(player_obj)
+
+            players_for_event.append(player_obj)
+            total_players_created += 1
+
+        event_obj.players = players_for_event
+
+    print(
+        f"Successfully added {total_players_created} players across 50 events.")
+    print("Successfully added 50 events.")
+
+
 async def _seed_players(session: AsyncSession):
     print("Seeding Players...")
 
     for i in range(1000):
         player = _generate_player()
-        print(f"Adding: {player.name}")
         player.rank = i + 1
-        player_obj = PlayerORM(**player.model_dump())
+        print(f"Adding: {player.name}")
+        player_obj = PlayerORM(
+            **player.model_dump(exclude={"id", "created_at", "updated_at"}))
         session.add(player_obj)
         await session.flush()
         await session.refresh(player_obj)
-    print(f'Successfully added {1000} players.')
+    print(f"Successfully added {1000} players.")
 
 
 async def _seed_categories(session: AsyncSession):
@@ -72,36 +130,14 @@ async def _seed_categories(session: AsyncSession):
     print(f'Successfully added {len(CATEGORIES)} categories.')
 
 
-async def _seed_clubs(session: AsyncSession):
-    print("Seeding Clubs...")
-    for club in fake_tennis_clubs:
-        await _create_club(session=session, name=club)
-    print(f'Successfully added {len(fake_tennis_clubs)} clubs.')
-
-
-async def _fill_clubs(session: AsyncSession):
-    clubs = list((await session.scalars(select(ClubORM))).all())
-    players = list((await session.scalars(select(PlayerORM))).all())
-    club_memberships = [
-        {
-            "club_id": fake.random_element(clubs).id,
-            "player_id": player.id,
-        }
-        for player in players
-    ]
-    await session.execute(insert(club_player), club_memberships)
-
-
 async def _run_seed():
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
 
     async with async_session_maker() as session:
-        await _seed_players(session)
-        await _seed_clubs(session)
         await _seed_categories(session)
-        await _fill_clubs(session)
+        await _seed_events(session)
         await session.commit()
 
 
