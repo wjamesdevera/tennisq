@@ -1,8 +1,8 @@
 """added new fields to event
 
-Revision ID: 68418ec03445
+Revision ID: 38c9782ea4ca
 Revises: d370c1761536
-Create Date: 2026-09-23 23:31:38.391725
+Create Date: 2026-09-23 23:53:20.224844
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '68418ec03445'
+revision: str = '38c9782ea4ca'
 down_revision: Union[str, Sequence[str], None] = 'd370c1761536'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
