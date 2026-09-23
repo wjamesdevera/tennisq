@@ -6,8 +6,7 @@ from app.db.engine import async_session_maker, engine
 from app.db.schema import Base
 from app.models.category import CategoryORM
 from app.models.player import PlayerORM
-from app.models.schemas import Player
-from app.models.club import ClubORM, club_player
+from app.schemas.player import Player
 from faker import Faker
 
 from sqlalchemy import insert, select
@@ -22,19 +21,6 @@ CATEGORIES = [
     "mixed_doubles",
 ]
 
-fake_tennis_clubs = [
-    "The Rochambeau Club",
-    "Bushwood Country Club",
-    "The Royal Tenenbaum Tennis Center",
-    "High Ridge Country Club",
-    "Encino Country Club",
-    "The Atlanta Tennis Club",
-    "Greenbriar Racquet & Country Club",
-    "Sunset Ridge Lawn Tennis Club",
-    "Pinewood Valley Racquet Club",
-    "The Rolling Hills Lawn & Tennis Association",
-]
-
 
 async def _create_category(session: AsyncSession, name: str):
     category_obj = CategoryORM(name=name)
@@ -42,14 +28,6 @@ async def _create_category(session: AsyncSession, name: str):
     session.add(category_obj)
     await session.flush()
     await session.refresh(category_obj)
-
-
-async def _create_club(session: AsyncSession, name: str):
-    club_obj = ClubORM(name=name)
-    print(f"Creating: {name}")
-    session.add(club_obj)
-    await session.flush()
-    await session.refresh(club_obj)
 
 
 def _generate_player() -> Player:
