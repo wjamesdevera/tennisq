@@ -16,10 +16,10 @@ class CreateEvent(BaseModel):
 
 class Event(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
     id: str | None = None
     name: str
-    type: str
+    description: str
+    max_players: int
     date: date_type | None = datetime.now()
     match_logs: List["MatchLog"] = Field(default_factory=list)
     created_at: datetime | None = None

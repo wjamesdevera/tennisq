@@ -2,8 +2,8 @@ from typing import TYPE_CHECKING, List
 import uuid
 
 from app.db.schema import Base
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-from sqlalchemy import String, DateTime, Date, Uuid, func, ForeignKey, Table, Column
+from sqlalchemy.orm import mapped_column, Mapped, relationship, validates
+from sqlalchemy import Integer, String, DateTime, Date, Uuid, func, ForeignKey, Table, Column, CheckConstraint
 from datetime import datetime
 
 from app.models.match import MatchLogORM
@@ -25,7 +25,17 @@ class EventORM(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(200))
-    type: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str] = mapped_column(String(200))
+
+    max_players: Mapped[int] = mapped_column(
+        Integer, CheckConstraint('max_players >= 2 AND max_player <= 100'))
+
+    @validates
+    def validate_max_players(self, key, value):
+        if not 2 <= value <= 100:
+            raise ValueError(f'Invalid age {value}')
+        return value
+
     date: Mapped[datetime] = mapped_column(Date, server_default=func.now())
 
     created_at: Mapped[datetime] = mapped_column(
