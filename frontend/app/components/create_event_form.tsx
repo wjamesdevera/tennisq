@@ -23,6 +23,7 @@ const CreateEventFormSchema = z.object({
     .int()
     .positive({ message: "Max players must be a positive integer" })
     .gte(2, { message: "Max players must be greater than or equal to 2" })
+    .lte(50, { message: "Max players must be less than or equal to 50" })
     .optional(),
 });
 
