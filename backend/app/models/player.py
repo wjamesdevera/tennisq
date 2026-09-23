@@ -4,13 +4,10 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from app.db.schema import Base
 from sqlalchemy import String, Integer, DateTime, func, Uuid
 from datetime import datetime
-from app.models.club import club_admin, club_player
-from app.models.event import event_player
 import uuid
 
 if TYPE_CHECKING:
-    from app.models.club import ClubORM
-    from app.models.event import EventORM
+    from app.models.event import EventORM, event_player
     from app.models.team import TeamORM
 
 
@@ -34,14 +31,6 @@ class PlayerORM(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
-    admin_clubs: Mapped[List["ClubORM"]] = relationship(
-        secondary=club_admin,
-        back_populates="admins"
-    )
-    clubs: Mapped[List["ClubORM"]] = relationship(
-        secondary=club_player,
-        back_populates="players"
-    )
     teams: Mapped[List["TeamORM"]] = relationship(
         secondary="team_player",
         back_populates="players"

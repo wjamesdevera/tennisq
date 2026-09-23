@@ -11,7 +11,6 @@ from app.db.schema import Base
 # Insert Models Here
 from app.models.team import TeamORM
 from app.models.player import PlayerORM
-from app.models.club import ClubORM
 from app.models.category import CategoryORM
 from app.models.event import EventORM
 from app.models.match import MatchLogORM, SetORM
