@@ -3,11 +3,7 @@ from datetime import datetime
 from uuid import UUID
 import uuid
 
-from pydantic import BaseModel, ConfigDict, Field
-from typing import TYPE_CHECKING, List
-
-if TYPE_CHECKING:
-    from .club import Club
+from pydantic import BaseModel, ConfigDict
 
 
 class AddPlayer(BaseModel):
@@ -29,6 +25,5 @@ class Player(BaseModel):
     sets_won: int = 0
     sets_lost: int = 0
     matches_played: int = 0
-    clubs: List["Club"] = Field(default_factory=list)
     created_at: datetime | None = None
     updated_at: datetime | None = None
