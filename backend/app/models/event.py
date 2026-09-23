@@ -28,7 +28,7 @@ class EventORM(Base):
     description: Mapped[str] = mapped_column(String(200))
 
     max_players: Mapped[int] = mapped_column(
-        Integer, CheckConstraint('max_players >= 2 AND max_player <= 100'))
+        Integer, CheckConstraint('max_players >= 2 AND max_players <= 100'))
 
     @validates
     def validate_max_players(self, key, value):
