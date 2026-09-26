@@ -5,8 +5,18 @@ from app.schemas.player import AddPlayer
 from fastapi import APIRouter, status, HTTPException
 from app.core.dependencies import AsyncSessionDep
 from app.services.event_service import EventService
+from app.schemas.event import Event
 
 router = APIRouter()
+
+
+# POST /events/
+@router.post('', status_code=status.HTTP_201_CREATED)
+async def create_event(event: Event):
+    return {
+        "status": "success",
+        "event": event
+    }
 
 
 # PATCH /events/:event_id/players
