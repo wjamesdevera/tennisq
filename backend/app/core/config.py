@@ -15,5 +15,9 @@ class Config(BaseSettings):
     def db_url(self):
         return f"sqlite+aiosqlite:///{self.db_name}"
 
+    @property
+    def test_db_url(self):
+        return f"sqlite+aiosqlite:///test_{self.db_name}"
+
 
 config = Config()
