@@ -13,8 +13,8 @@ if TYPE_CHECKING:
 class Event(BaseModel):
     name: str
     description: str
-    max_players: int
-    date: date_type | None = datetime.now()
+    max_players: int = Field(ge=2, le=50)
+    date: date_type
 
     model_config = ConfigDict(from_attributes=True)
     # match_logs: List["MatchLog"] = Field(default_factory=list)
