@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.event import EventORM
+from app.schemas.event import Event, CreateEvent, ReadEvent
 import uuid
 
 
@@ -28,3 +29,11 @@ class EventService:
 
         event_obj.players.append(player_obj)
         return event_obj
+
+    async def create_event(self, event: CreateEvent) -> ReadEvent:
+        new_event = EventORM(**event.model_dump())
+        self.session.add(new_event)
+        await self.session.flush()
+        await self.session.refresh(new_event)
+        new_event = ReadEvent.model_validate(new_event)
+        return new_event
