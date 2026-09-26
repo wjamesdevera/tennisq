@@ -139,7 +139,6 @@ async def reset_schema(engine):
 async def run_seed(session):
     """Seed data using an existing session. Awaitable directly from async code."""
     await _seed_categories(session)
-    await _seed_events(session)
     await session.commit()
 
 
