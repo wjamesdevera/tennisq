@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-seed = "app.db.seed:run_seed"
+seed = "app.db.seed:run_seed_cli"
 
 [dependency-groups]
 dev = [

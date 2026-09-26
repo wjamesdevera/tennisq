@@ -130,16 +130,24 @@ async def _seed_categories(session: AsyncSession):
     print(f'Successfully added {len(CATEGORIES)} categories.')
 
 
-async def _run_seed():
+async def reset_schema(engine):
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
 
-    async with async_session_maker() as session:
-        await _seed_categories(session)
-        await _seed_events(session)
-        await session.commit()
+
+async def run_seed(session):
+    """Seed data using an existing session. Awaitable directly from async code."""
+    await _seed_categories(session)
+    await _seed_events(session)
+    await session.commit()
 
 
-def run_seed():
-    asyncio.run(_run_seed())
+def run_seed_cli():
+    """Sync entrypoint for CLI/script usage — builds its own engine/session."""
+    async def _main():
+        await reset_schema(engine)
+        async with async_session_maker() as session:
+            await run_seed(session)
+
+    asyncio.run(_main())
