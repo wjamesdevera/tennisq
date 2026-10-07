@@ -17,7 +17,7 @@ async def create_event(event: CreateEvent, session: AsyncSessionDep):
     new_event = await event_service.create_event(event)
     return {
         "status": "success",
-        "event": new_event
+        "data": new_event
     }
 
 
