@@ -9,9 +9,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import * as z from "zod";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import { createEvent } from "../lib/api";
+import { useRouter } from "next/navigation";
 
 const CreateEventFormSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
+  name: z.string().min(1, { message: "Title is required" }),
   description: z.string().optional(),
   date: z
     .string()
@@ -23,17 +25,22 @@ const CreateEventFormSchema = z.object({
     .int()
     .positive({ message: "Max players must be a positive integer" })
     .gte(2, { message: "Max players must be greater than or equal to 2" })
-    .lte(50, { message: "Max players must be less than or equal to 50" })
-    .optional(),
+    .lte(50, { message: "Max players must be less than or equal to 50" }),
 });
 
 type CreateEventFormInput = z.input<typeof CreateEventFormSchema>;
 type CreateEventFormOutput = z.output<typeof CreateEventFormSchema>;
 
 const CreateEventForm: React.FC = () => {
-  const onSubmit = (data: CreateEventFormOutput) => {
-    console.log(data);
-  };
+  const router = useRouter();
+  async function onSubmit(data: CreateEventFormOutput) {
+    try {
+      const newEvent = await createEvent(data);
+      router.push(`/events/${newEvent.data.id}`);
+    } catch (error) {
+      console.error("Failed to create event:", error);
+    }
+  }
 
   const {
     register,
@@ -51,9 +58,9 @@ const CreateEventForm: React.FC = () => {
       >
         <TextField
           label="Title"
-          {...register("title")}
-          error={!!errors.title}
-          helperText={errors.title?.message}
+          {...register("name")}
+          error={!!errors.name}
+          helperText={errors.name?.message}
         />
         <TextField
           label="Description"

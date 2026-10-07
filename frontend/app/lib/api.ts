@@ -126,3 +126,19 @@ const players: PlayerTableRow[] = [
 export async function getPlayers(): Promise<PlayerTableRow[]> {
   return players;
 }
+
+export async function createEvent(
+  eventData: CreateEvent,
+): Promise<{ status: string; data: Event }> {
+  const res = await fetch("/api/events", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(eventData),
+  });
+  if (!res.ok) {
+    throw new Error("Failed to create event");
+  }
+  return res.json();
+}
