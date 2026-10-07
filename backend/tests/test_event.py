@@ -12,12 +12,12 @@ def test_create_event(client):
     data = response.json()
 
     assert response.status_code == 201
-    assert data['event']['name'] == "Open Play"
-    assert data['event']['description'] == "Open Play Description"
-    assert data['event']['date'] == "2026-09-26"
-    assert data['event']['max_players'] == 30
-    assert data['event']['created_at'] is not None
-    assert data['event']['updated_at'] is not None
+    assert data['data']['name'] == "Open Play"
+    assert data['data']['description'] == "Open Play Description"
+    assert data['data']['date'] == "2026-09-26"
+    assert data['data']['max_players'] == 30
+    assert data['data']['created_at'] is not None
+    assert data['data']['updated_at'] is not None
 
 
 def test_missing_name(client):
