@@ -19,16 +19,15 @@ class Event(BaseModel):
     date: date_type
 
     model_config = ConfigDict(
-        from_attributes=True
+        from_attributes=True,
+        populate_by_name=True,
+        alias_generator=to_camel
     )
     # match_logs: List["MatchLog"] = Field(default_factory=list)
     # players: List["Player"] = Field(default_factory=list)
 
 
 class CreateEvent(Event):
-    model_config = ConfigDict(
-        alias_generator=to_camel
-    )
     pass
 
 
