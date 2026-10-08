@@ -5,9 +5,29 @@ from app.schemas.player import AddPlayer
 from fastapi import APIRouter, status, HTTPException
 from app.core.dependencies import AsyncSessionDep
 from app.services.event_service import EventService
-from app.schemas.event import CreateEvent
+from app.schemas.event import CreateEvent, ReadEvent
 
 router = APIRouter()
+
+
+@router.get('/{event_id}', status_code=status.HTTP_200_OK)
+async def get_event(event_id: uuid.UUID, session: AsyncSessionDep):
+    event_service = EventService(session)
+    event = await event_service.get_event(event_id)
+    if not event:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "status": "error",
+                "message": f"Event ID: {event_id} not found",
+                "code": 404,
+            }
+        )
+    formatted_event = ReadEvent.model_validate(event)
+    return {
+        "status": "success",
+        "data": formatted_event,
+    }
 
 
 # POST /events/

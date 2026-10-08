@@ -17,6 +17,11 @@ class EventService:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_event(self, event_id: uuid.UUID) -> EventORM:
+        stmt = select(EventORM).where(EventORM.id == event_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def add_player(self, player_id: uuid.UUID, event_id: uuid.UUID) -> EventORM:
         stmt = select(EventORM).where(
             EventORM.id == event_id).options(selectinload(EventORM.players))
