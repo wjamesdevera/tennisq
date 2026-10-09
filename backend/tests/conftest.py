@@ -1,4 +1,7 @@
+from datetime import date
+
 import pytest_asyncio
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -9,7 +12,8 @@ from sqlalchemy.ext.asyncio import (
 from app.db.engine import get_async_session
 from app.main import app
 from app.core.config import config
-from app.db.seed import reset_schema, run_seed
+from app.db.seed import reset_schema
+from app.models.event import EventORM
 
 
 @pytest_asyncio.fixture(name="session")
@@ -32,7 +36,6 @@ async def session_fixture():
     await reset_schema(engine)
 
     async with async_session_maker() as session:
-        await run_seed(session)
         try:
             yield session
             await session.commit()
@@ -55,3 +58,17 @@ async def client_fixture(session: AsyncSession):
     client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture(name="event")
+async def event_fixture(session: AsyncSession) -> EventORM:
+    event = EventORM(
+        name="Test Event",
+        description="Event used to test retrieving an event",
+        date=date(2026, 9, 26),
+        max_players=30,
+    )
+    session.add(event)
+    await session.flush()
+    await session.refresh(event)
+    return event
