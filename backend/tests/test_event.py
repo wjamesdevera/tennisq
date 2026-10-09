@@ -1,4 +1,6 @@
-def test_create_event(client):
+
+def test_create_event_returns_201_with_created_event(client):
+    """Test creating a valid event returns a 201 and the created event"""
 
     response = client.post(
         "/v1/events", json={
