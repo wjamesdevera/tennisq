@@ -1,8 +1,8 @@
 from app.models.player import PlayerORM
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models.event import EventORM
+from app.models.event import EventORM, event_player
 from app.models.player import PlayerORM
 from app.schemas.event import CreateEvent, ReadEvent
 from app.core.errors import NotFoundError
@@ -25,14 +25,37 @@ class EventService:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_event_player(self, event_id: uuid.UUID) -> List[PlayerORM]:
-        stmt = select(EventORM).where(EventORM.id == event_id).options(
-            selectinload(EventORM.players))
-        result = await self.session.execute(stmt)
-        event = result.scalar_one_or_none()
-        if not event:
-            raise NotFoundError
-        return event.players
+    async def get_event_player(self, event_id: uuid.UUID, limit: int = 20, offset: int = 0) -> List[PlayerORM]:
+        # 1. Make sure the event exists (so "no players" != "no such event")
+        event_exists = await self.session.scalar(
+            select(EventORM.id).where(EventORM.id == event_id)
+        )
+        if event_exists is None:
+            raise NotFoundError(f"Event {event_id} not found.")
+
+        # 2. Total count, without loading any players
+        total = await self.session.scalar(
+            select(func.count())
+            .select_from(event_player)
+            .where(event_player.c.event_id == event_id)
+        )
+
+        stmt = (
+            select(PlayerORM)
+            .join(event_player, event_player.c.player_id == PlayerORM.id)
+            .where(event_player.c.event_id == event_id)
+            .order_by(PlayerORM.name, PlayerORM.id)
+            .limit(limit)
+            .offset(offset)
+        )
+        players = (await self.session.scalars(stmt)).all()
+
+        return {
+            "limit": limit,
+            "offset": offset,
+            "total": total,
+            "players": players
+        }
 
     async def add_player(self, player_id: uuid.UUID, event_id: uuid.UUID) -> EventORM:
         stmt = select(EventORM).where(
