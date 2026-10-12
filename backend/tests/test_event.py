@@ -25,90 +25,73 @@ def test_create_event_returns_201_with_created_event(client):
     assert data['data']['updatedAt'] is not None
 
 
-def test_missing_name(client):
-    response = client.post(
-        "/v1/events", json={
+@pytest.mark.parametrize("payload, bad_field", [
+    (
+        {
             "description": "Open Play Description",
             "date": "2026-09-26",
-            "max_players": 30
-        }
-    )
-
-    assert response.status_code >= 400 and response.status_code < 500
-
-
-def test_missing_description(client):
-    response = client.post(
-        "/v1/events", json={
+            "maxPlayers": 30
+        },
+        "name"
+    ),  # missing name
+    (
+        {
             "name": "Open Play",
             "date": "2026-09-26",
-            "max_players": 30
-        }
-    )
-
-    assert response.status_code >= 400 and response.status_code < 500
-
-
-def test_missing_date(client):
-    response = client.post(
-        "/v1/events", json={
+            "maxPlayers": 30
+        },
+        "description"
+    ),  # missing description
+    (
+        {
             "name": "Open Play",
             "description": "Open Play Description",
-            "max_players": 30
-        }
-    )
-
-    assert response.status_code >= 400 and response.status_code < 500
-
-
-def test_missing_max_players(client):
-    response = client.post(
-        "/v1/events", json={
+            "maxPlayers": 30
+        },
+        "date"
+    ),  # missing date
+    (
+        {
             "name": "Open Play",
             "description": "Open Play Description",
             "date": "2026-09-26",
-        }
-    )
-
-    assert response.status_code >= 400 and response.status_code < 500
-
-
-def test_invalid_date_format(client):
-    response = client.post(
-        "/v1/events", json={
+        },
+        "maxPlayers"
+    ),  # missing max_players
+    (
+        {
             "name": "Open Play",
             "description": "Open Play Description",
+            "maxPlayers": 30,
             "date": "2026-09",
-        }
-    )
-
-    assert response.status_code >= 400 and response.status_code < 500
-
-
-def test_negative_max_players(client):
-    response = client.post(
-        "/v1/events", json={
+        },
+        "date"
+    ),  # invalid date format
+    (
+        {
             "name": "Open Play",
             "description": "Open Play Description",
             "date": "2026-09-26",
-            "max_players": -10
-        }
-    )
-
-    assert response.status_code >= 400 and response.status_code < 500
-
-
-def test_above_max_players_limit(client):
-    response = client.post(
-        "/v1/events", json={
+            "maxPlayers": -10
+        },
+        "maxPlayers"
+    ),  # negative max players
+    (
+        {
             "name": "Open Play",
             "description": "Open Play Description",
             "date": "2026-09-26",
-            "max_players": 100
-        }
-    )
+            "maxPlayers": 100
+        },
+        "maxPlayers"
+    ),  # above max_players limit
+])
+def test_create_event_with_invalid_payload_returns_422(client, payload, bad_field):
+    response = client.post("v1/events", json=payload)
 
-    assert response.status_code >= 400 and response.status_code < 500
+    assert response.status_code == 422
+    assert bad_field in [err for part in response.json()['detail']
+                         for err in part['loc']]
 
 
 def test_fetch_event_returns_200_and_the_event(client, event):
