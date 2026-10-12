@@ -6,6 +6,7 @@ from fastapi import APIRouter, status, HTTPException
 from app.core.dependencies import AsyncSessionDep
 from app.services.event_service import EventService
 from app.schemas.event import CreateEvent, ReadEvent
+from app.core.errors import NotFoundError
 
 router = APIRouter()
 
@@ -27,6 +28,27 @@ async def get_event(event_id: uuid.UUID, session: AsyncSessionDep):
     return {
         "status": "success",
         "data": formatted_event,
+    }
+
+
+@router.get('/{event_id}/players', status_code=status.HTTP_200_OK)
+async def get_event_players(event_id: uuid.UUID, session: AsyncSessionDep):
+    event_service = EventService(session)
+    try:
+        players = await event_service.get_event_player(event_id)
+    except NotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "status": "error",
+                "message": f"Event ID: {event_id} not found",
+                "code": 404,
+            }
+        )
+
+    return {
+        "status": "success",
+        "data": players,
     }
 
 

@@ -3,7 +3,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.event import EventORM
-from app.schemas.event import Event, CreateEvent, ReadEvent
+from app.models.player import PlayerORM
+from app.schemas.event import CreateEvent, ReadEvent
+from app.core.errors import NotFoundError
+from typing import List
 import uuid
 
 
@@ -21,6 +24,15 @@ class EventService:
         stmt = select(EventORM).where(EventORM.id == event_id)
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def get_event_player(self, event_id: uuid.UUID) -> List[PlayerORM]:
+        stmt = select(EventORM).where(EventORM.id == event_id).options(
+            selectinload(EventORM.players))
+        result = await self.session.execute(stmt)
+        event = result.scalar_one_or_none()
+        if not event:
+            raise NotFoundError
+        return event.players
 
     async def add_player(self, player_id: uuid.UUID, event_id: uuid.UUID) -> EventORM:
         stmt = select(EventORM).where(
