@@ -22,6 +22,8 @@ CATEGORIES = [
     "mixed_doubles",
 ]
 
+EVENT_COUNT = 50
+
 
 async def _create_category(session: AsyncSession, name: str):
     category_obj = CategoryORM(name=name)
@@ -71,41 +73,40 @@ def _generate_event() -> Event:
     )
 
 
-async def _seed_events(session: AsyncSession):
+async def _seed_events(session: AsyncSession) -> None:
     print("Seeding Events...")
     total_players_created = 0
 
-    for event_index in range(50):
+    for _ in range(EVENT_COUNT):
         event: Event = _generate_event()
-        print(f"Adding: {event.name}")
-
         event_data = event.model_dump(exclude={"players", "match_logs"})
-        event_obj = EventORM(**event_data)
+
+        # Respect the event's own capacity
+        max_for_event = min(event_data["max_players"], 50)
+        number_of_players = fake.random_int(2, max_for_event)
+
+        players = [
+            PlayerORM(
+                **_generate_player().model_dump(
+                    exclude={"id", "created_at", "updated_at"}
+                )
+            )
+            for _ in range(number_of_players)
+        ]
+
+        # Passing players in the constructor: new objects, so no lazy load,
+        # and cascade adds the players to the session automatically.
+        event_obj = EventORM(**event_data, players=players)
         session.add(event_obj)
-        await session.flush()
-        await session.refresh(event_obj, attribute_names=["players"])
 
-        number_of_players = fake.random_int(2, 50)
-        print(f"Adding {number_of_players} Players to {event_obj.name}...")
+        total_players_created += number_of_players
+        print(f"Added {event_obj.name} with {number_of_players} players")
 
-        players_for_event: list[PlayerORM] = []
-        for _ in range(number_of_players):
-            player = _generate_player()
-            print(f"Adding: {player.name}")
-            player_obj = PlayerORM(
-                **player.model_dump(exclude={"id", "created_at", "updated_at"}))
-            session.add(player_obj)
-            await session.flush()
-            await session.refresh(player_obj)
-
-            players_for_event.append(player_obj)
-            total_players_created += 1
-
-        event_obj.players = players_for_event
+    await session.flush()   # one flush for everything
+    await session.commit()  # drop this if the caller manages the transaction
 
     print(
-        f"Successfully added {total_players_created} players across 50 events.")
-    print("Successfully added 50 events.")
+        f"Successfully added {total_players_created} players across {EVENT_COUNT} events.")
 
 
 async def _seed_players(session: AsyncSession):
