@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
+from pydantic.alias_generators import to_camel
 import uuid
 
 from pydantic import BaseModel, ConfigDict
@@ -15,7 +16,11 @@ class CreatePlayer(BaseModel):
 
 
 class Player(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=to_camel,
+        populate_by_name=True
+    )
 
     id: uuid.UUID | None = None
     name: str

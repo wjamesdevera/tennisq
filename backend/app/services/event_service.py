@@ -4,6 +4,7 @@ from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.event import EventORM, event_player
 from app.models.player import PlayerORM
+from app.schemas.player import Player
 from app.schemas.event import CreateEvent, ReadEvent
 from app.core.errors import NotFoundError
 from typing import List
@@ -25,7 +26,7 @@ class EventService:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_event_player(self, event_id: uuid.UUID, limit: int = 20, offset: int = 0) -> List[PlayerORM]:
+    async def get_event_player(self, event_id: uuid.UUID, limit: int = 20, offset: int = 0) -> dict:
         # 1. Make sure the event exists (so "no players" != "no such event")
         event_exists = await self.session.scalar(
             select(EventORM.id).where(EventORM.id == event_id)
@@ -49,6 +50,7 @@ class EventService:
             .offset(offset)
         )
         players = (await self.session.scalars(stmt)).all()
+        players = [Player.model_validate(player) for player in players]
 
         return {
             "limit": limit,
