@@ -32,7 +32,7 @@ async def get_event(event_id: uuid.UUID, session: AsyncSessionDep):
 
 
 @router.get('/{event_id}/players', status_code=status.HTTP_200_OK)
-async def get_event_players(event_id: uuid.UUID, session: AsyncSessionDep, limit=20, offset=0):
+async def get_event_players(event_id: uuid.UUID, session: AsyncSessionDep, limit: int = 20, offset: int = 0):
     event_service = EventService(session)
     try:
         players = await event_service.get_event_player(event_id, limit, offset)
