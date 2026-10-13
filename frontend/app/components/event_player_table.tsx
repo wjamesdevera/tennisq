@@ -68,31 +68,31 @@ const headCells: readonly HeadCell[] = [
     label: "Rank",
   },
   {
-    id: "games_won",
+    id: "gamesWon",
     numeric: true,
     disablePadding: false,
     label: "Games Won",
   },
   {
-    id: "games_lost",
+    id: "gamesLost",
     numeric: true,
     disablePadding: false,
     label: "Games Lost",
   },
   {
-    id: "sets_won",
+    id: "setsWon",
     numeric: true,
     disablePadding: false,
     label: "Sets Won",
   },
   {
-    id: "sets_lost",
+    id: "setsLost",
     numeric: true,
     disablePadding: false,
     label: "Sets Lost",
   },
   {
-    id: "matches_played",
+    id: "matchesPlayed",
     numeric: true,
     disablePadding: false,
     label: "Matches Played",
@@ -241,11 +241,11 @@ export default function EventPlayerTable({ rows }: EventPlayerTableProps) {
                       {row.name}
                     </TableCell>
                     <TableCell align="right">{row.rank}</TableCell>
-                    <TableCell align="right">{row.games_won}</TableCell>
-                    <TableCell align="right">{row.games_lost}</TableCell>
-                    <TableCell align="right">{row.sets_won}</TableCell>
-                    <TableCell align="right">{row.sets_lost}</TableCell>
-                    <TableCell align="right">{row.matches_played}</TableCell>
+                    <TableCell align="right">{row.gamesWon}</TableCell>
+                    <TableCell align="right">{row.gamesLost}</TableCell>
+                    <TableCell align="right">{row.setsWon}</TableCell>
+                    <TableCell align="right">{row.setsLost}</TableCell>
+                    <TableCell align="right">{row.matchesPlayed}</TableCell>
                   </TableRow>
                 );
               })}

@@ -1,5 +1,5 @@
 import EventPlayerTable from "@/app/components/event_player_table";
-import { getPlayers } from "@/app/lib/api";
+import { getEvent, getPlayers } from "@/app/lib/api";
 
 export default async function EventPage({
   params,
@@ -7,13 +7,27 @@ export default async function EventPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const players = await getPlayers();
+  const playerData = await getPlayers(id);
+  const eventData = await getEvent(id);
+  const players = playerData["data"]["players"].map((player) => ({
+    id: player.id,
+    name: player.name,
+    rank: player.rank,
+    gamesWon: player.gamesWon,
+    gamesLost: player.gamesLost,
+    setsWon: player.setsWon,
+    setsLost: player.setsLost,
+    matchesPlayed: player.matchesPlayed,
+  }));
+
   return (
     <>
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         <div className="max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-2">
-          <h2 className="font-bold text-xl">Event: {id}</h2>
-          <p>Event Date: {new Date().toLocaleDateString()}</p>
+          <h2 className="font-bold text-xl">Event: {eventData.data.name}</h2>
+          <p>
+            Event Date: {new Date(eventData.data.date).toLocaleDateString()}
+          </p>
         </div>
         <div className="rounded-lg border border-gray-100 p-4 max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-4">
           <h3 className="font-bold text-lg">Next Match Up</h3>

@@ -2,22 +2,32 @@ interface Player {
   id: number;
   name: string;
   rank: number;
-  games_won: number;
-  games_lost: number;
-  sets_won: number;
-  sets_lost: number;
-  matches_played: number;
-  created_at: string;
-  updated_at: string;
+  gamesWon: number;
+  gamesLost: number;
+  setsWon: number;
+  setsLost: number;
+  matchesPlayed: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface GetPlayersResponse {
+  status: string;
+  data: {
+    total: number;
+    limit: number;
+    offset: number;
+    players: Player[];
+  };
 }
 
 interface PlayerTableRow {
   id: number;
   name: string;
   rank: number;
-  games_won: number;
-  games_lost: number;
-  sets_won: number;
-  sets_lost: number;
-  matches_played: number;
+  gamesWon: number;
+  gamesLost: number;
+  setsWon: number;
+  setsLost: number;
+  matchesPlayed: number;
 }
