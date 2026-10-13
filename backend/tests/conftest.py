@@ -1,7 +1,6 @@
 from datetime import date
 
 import pytest_asyncio
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -14,6 +13,7 @@ from app.main import app
 from app.core.config import config
 from app.db.seed import reset_schema
 from app.models.event import EventORM
+from app.models.player import PlayerORM
 
 
 @pytest_asyncio.fixture(name="session")
@@ -68,6 +68,9 @@ async def event_fixture(session: AsyncSession) -> EventORM:
         date=date(2026, 9, 26),
         max_players=30,
     )
+    for i in range(40):
+        player = PlayerORM(name=f"Test Player {i}")
+        event.players.append(player)
     session.add(event)
     await session.flush()
     await session.refresh(event)

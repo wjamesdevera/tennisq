@@ -116,3 +116,28 @@ def test_fetch_for_invalid_event_returns_422(client):
     response = client.get(f"/v1/events/fahafa")
 
     assert response.status_code == 422
+
+
+def test_fetch_event_players_returns_200_and_a_list_of_players(client, event):
+    response = client.get(f'/v1/events/{event.id}/players')
+
+    assert response.status_code == 200
+    data = response.json()['data']
+    assert data['total'] == 40
+    assert data['limit'] == 20
+    assert data['offset'] == 0
+
+
+@pytest.mark.parametrize("limit, offset, expected", [
+    (20, 0, {"limit": 20, "offset": 0}),
+    (20, 20, {"limit": 20, "offset": 20}),
+])
+def test_fetch_event_players_returns_200_and_a_list_of_players(client, event, limit, offset, expected):
+    response = client.get(
+        f'/v1/events/{event.id}/players?limit={limit}&offset={offset}')
+
+    assert response.status_code == 200
+    data = response.json()['data']
+    assert data['total'] == 40
+    assert data['limit'] == expected['limit']
+    assert data['offset'] == expected['offset']
