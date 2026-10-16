@@ -1,16 +1,16 @@
 import uuid
 
-from app.services.player_service import PlayerService
-from app.schemas.player import AddPlayer
+from app.schemas.player import CreatePlayer
 from fastapi import APIRouter, status, HTTPException
 from app.core.dependencies import AsyncSessionDep
 from app.services.event_service import EventService
 from app.schemas.event import CreateEvent, ReadEvent
-from app.core.errors import NotFoundError
+from app.core.errors import NotFoundError, AlreadyExistsError
 
 router = APIRouter()
 
 
+# GET /v1/events/:event_id
 @router.get('/{event_id}', status_code=status.HTTP_200_OK)
 async def get_event(event_id: uuid.UUID, session: AsyncSessionDep):
     event_service = EventService(session)
@@ -31,6 +31,7 @@ async def get_event(event_id: uuid.UUID, session: AsyncSessionDep):
     }
 
 
+# GET /v1/events/:event_id/players
 @router.get('/{event_id}/players', status_code=status.HTTP_200_OK)
 async def get_event_players(event_id: uuid.UUID, session: AsyncSessionDep, limit: int = 20, offset: int = 0):
     event_service = EventService(session)
@@ -52,7 +53,7 @@ async def get_event_players(event_id: uuid.UUID, session: AsyncSessionDep, limit
     }
 
 
-# POST /events/
+# POST /v1/events/
 @router.post('', status_code=status.HTTP_201_CREATED)
 async def create_event(event: CreateEvent, session: AsyncSessionDep):
     event_service = EventService(session)
@@ -63,43 +64,32 @@ async def create_event(event: CreateEvent, session: AsyncSessionDep):
     }
 
 
-# PATCH /events/:event_id/players
-@router.patch('/{event_id}/players', status_code=status.HTTP_200_OK)
-async def add_player(event_id: uuid.UUID, player: AddPlayer, session: AsyncSessionDep):
+# POST /v1/events/:event_id/players
+@router.post('/{event_id}/players', status_code=status.HTTP_201_CREATED)
+async def add_player(event_id: uuid.UUID, player: CreatePlayer, session: AsyncSessionDep):
     event_service = EventService(session)
-    player_service = PlayerService(session)
-
-    event_obj = await event_service.find_event(event_id)
-    if not event_obj:
+    try:
+        new_player = await event_service.add_player(player=player, event_id=event_id)
+    except NotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status": "error",
-                "message": f"Event ID: {event_id} not found",
+                "message": f"Event ID: {event_id} not found.",
                 "code": 404,
             }
         )
-    player_obj = await player_service.find_player(player.id, with_club=True)
-    if not player_obj:
+    except AlreadyExistsError:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_409_CONFLICT,
             detail={
                 "status": "error",
-                "message": f"Player ID: {player.id} not found",
-                "code": 404,
-            }
-        )
-    if event_obj.club not in player_obj.clubs:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "status": "error",
-                "message": f"{player_obj.name} not member of club {event_obj.club.name}",
-                "code": 400,
+                "message": f"Player: {player.first_name} {player.last_name} already exist.",
+                "code": 409,
             }
         )
 
-    updated_event = await event_service.add_player(player_obj.id, event_obj.id, session)
-
-    # if member is part of club add player to event
-    return {"success": "ok", "result": updated_event}
+    return {
+        "status": "success",
+        "data": new_player
+    }
