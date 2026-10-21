@@ -141,3 +141,17 @@ def test_fetch_event_players_returns_200_and_a_list_of_players(client, event, li
     assert data['total'] == 40
     assert data['limit'] == expected['limit']
     assert data['offset'] == expected['offset']
+
+
+def test_adding_event_players_returns_201_and_created_player(client, event):
+    response = client.post(
+        f'/v1/events/{event.id}/players',
+        json={
+            "firstName": "Juan",
+            "lastName": "Dela Cruz"
+        }
+    )
+
+    assert response.status_code == 201
+    data = response.json()['data']
+    data['name'] = "Juan Dela Cruz"
