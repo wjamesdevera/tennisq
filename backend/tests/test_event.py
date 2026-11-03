@@ -143,15 +143,40 @@ def test_fetch_event_players_returns_200_and_a_list_of_players(client, event, li
     assert data['offset'] == expected['offset']
 
 
+VALID = {"firstName": "Juan", "lastName": "Dela Cruz"}
+
+INVALID_VALUES = {
+    "blank": "",
+    "too_long": "c" * 256,
+    "null": None,
+    "whitespace_only": " ",
+    "sql_injection": '"; DROP TABLE players',
+    "xss": "<script>alert('XSS')</script>",
+}
+
+FIELDS = ["firstName", "lastName"]
+
+
 def test_adding_event_players_returns_201_and_created_player(client, event):
+    payload = {**VALID}
     response = client.post(
         f'/v1/events/{event.id}/players',
-        json={
-            "firstName": "Juan",
-            "lastName": "Dela Cruz"
-        }
+        json=payload
     )
 
     assert response.status_code == 201
     data = response.json()['data']
     data['name'] = "Juan Dela Cruz"
+
+
+@pytest.mark.parametrize("bad_field", FIELDS)
+@pytest.mark.parametrize("bad_value", INVALID_VALUES.values(), ids=INVALID_VALUES.keys())
+def test_adding_invalid_event_players_returns_422(client, event, bad_field, bad_value):
+    payload = {**VALID, bad_field: bad_value}
+
+    response = client.post(f"/v1/events/{event.id}/players", json=payload)
+
+    assert response.status_code == 422
+    error_locs = [loc for err in response.json()["detail"]
+                  for loc in err["loc"]]
+    assert bad_field in error_locs
