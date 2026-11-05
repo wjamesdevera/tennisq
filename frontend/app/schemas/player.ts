@@ -31,3 +31,8 @@ interface PlayerTableRow {
   setsLost: number;
   matchesPlayed: number;
 }
+
+interface CreatePlayer {
+  firstName: string;
+  lastName: string;
+}
