@@ -39,3 +39,20 @@ export async function createEvent(
   }
   return res.json();
 }
+
+export async function addPlayerToEvent(
+  eventId: string,
+  playerData: CreatePlayer,
+): Promise<{ status: string; data: Player }> {
+  const res = await fetch(`/api/events/${eventId}/players`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(playerData),
+  });
+  if (!res.ok) {
+    throw new Error("Failed to add player to event");
+  }
+  return res.json();
+}

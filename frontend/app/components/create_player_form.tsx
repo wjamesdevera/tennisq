@@ -3,6 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
+import { addPlayerToEvent } from "@/app/lib/api";
+import { useRouter } from "next/navigation";
 
 const CreatePlayerFormSchema = z.object({
   firstName: z
@@ -15,15 +17,40 @@ const CreatePlayerFormSchema = z.object({
     .max(50, { message: "Last name must be less than 50 characters" }),
 });
 
-const CreatePlayerForm = () => {
+type Props = {
+  id: string;
+};
+
+const CreatePlayerForm = ({ id }: Props) => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    setError,
+    formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(CreatePlayerFormSchema) });
+
+  const onSubmit = (data: CreatePlayer) => {
+    addPlayerToEvent(id, data)
+      .then((response) => {
+        reset();
+        router.push(`/events/${id}`);
+        router.refresh();
+      })
+      .catch((error) => {
+        console.error("Error adding player:", error);
+        setError("root", {
+          type: "manual",
+          message:
+            "An error occurred while adding the player. Please try again.",
+        });
+      });
+  };
+
   return (
     <form
-      onSubmit={handleSubmit((data) => console.log(data))}
+      onSubmit={handleSubmit(onSubmit)}
       className="flex w-full max-w-md flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-lg sm:p-8"
     >
       <header className="flex flex-col gap-2">
@@ -35,7 +62,10 @@ const CreatePlayerForm = () => {
         </p>
       </header>
       <div className="flex flex-col gap-2">
-        <label htmlFor="firstName" className="text-sm font-medium text-slate-700">
+        <label
+          htmlFor="firstName"
+          className="text-sm font-medium text-slate-700"
+        >
           First name
         </label>
         <input
@@ -54,7 +84,10 @@ const CreatePlayerForm = () => {
         )}
       </div>
       <div className="flex flex-col gap-2">
-        <label htmlFor="lastName" className="text-sm font-medium text-slate-700">
+        <label
+          htmlFor="lastName"
+          className="text-sm font-medium text-slate-700"
+        >
           Last name
         </label>
         <input
@@ -74,9 +107,10 @@ const CreatePlayerForm = () => {
       </div>
       <button
         type="submit"
+        disabled={isSubmitting}
         className="rounded-lg bg-blue-700 px-4 py-3 font-semibold text-white transition-colors hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2"
       >
-        Save player
+        {isSubmitting ? "Adding..." : "Add Player"}
       </button>
     </form>
   );

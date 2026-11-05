@@ -1,5 +1,7 @@
 import EventPlayerTable from "@/app/components/event_player_table";
 import { getEvent, getPlayers } from "@/app/lib/api";
+import { notFound } from "next/dist/client/components/navigation";
+import Link from "next/link";
 
 export default async function EventPage({
   params,
@@ -7,8 +9,8 @@ export default async function EventPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const playerData = await getPlayers(id);
-  const eventData = await getEvent(id);
+  const playerData = await getPlayers(id).catch(() => notFound());
+  const eventData = await getEvent(id).catch(() => notFound());
   const players = playerData["data"]["players"].map((player) => ({
     id: player.id,
     name: player.name,
@@ -19,6 +21,10 @@ export default async function EventPage({
     setsLost: player.setsLost,
     matchesPlayed: player.matchesPlayed,
   }));
+
+  const openAddPlayerForm = () => {
+    console.log("Add Player button clicked");
+  };
 
   return (
     <>
@@ -48,6 +54,14 @@ export default async function EventPage({
               </ul>
             </div>
           </div>
+        </div>
+        <div className="p-4 max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex mb-4">
+          <Link
+            href={`/events/${id}/players/add`}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Add Player
+          </Link>
         </div>
         <article className="max-w-5xl w-full flex flex-col items-center justify-between font-mono text-sm lg:flex">
           <EventPlayerTable rows={players} />
